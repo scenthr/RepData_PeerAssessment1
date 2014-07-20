@@ -1,20 +1,59 @@
-# Reproducible Research: Peer Assessment 1
+###Loading and preprocessing the data
 
+We load the "activity.csv" data from the working directory and check the basic 
+characteristics of the loaded dataset. We change the datatype of "date" column 
+from factor data type to date datatype. 
 
-## Loading and preprocessing the data
+```{r}
+activity <- read.table("activity.csv",sep=",",quote="\"'",header=TRUE)
+str(activity)
+```
 
+###What is mean total number of steps taken per day?
 
+We need to create a histogram of the total number of steps taken each day. 
+For this we will use ggplot2 R package as well as xtable, so please install them
+before continuing.
 
-## What is mean total number of steps taken per day?
+```{r results='asis',echo=FALSE}
+##install.packages("ggplot2")
+##install.packages("xtable")
+```
 
+After installing ggplot2 R package proceed with creating the histogram.
+```{r}
+library(ggplot2)
+stepperday <- aggregate(activity[,"steps"] ~ activity[,"date"],activity,sum)
+names(stepperday) <- c("date","steps")
+stepperday$date <- as.Date(stepperday$date,"%Y-%m-%d")
+p <- ggplot(stepperday, aes(date, steps))
+p <- p + geom_histogram(binwidth = 0.5, stat="identity", colour="white") 
+p
+```
 
+A quick summary will tell us no. of steps mean and median for the whole dataset.
+```{r}
+summary(stepperday)
+```
 
-## What is the average daily activity pattern?
+Here is the table of mean values for each day
+```{r results='asis'}
+stepperdaymean <- aggregate(activity[,"steps"] ~ activity[,"date"],
+                            activity,
+                            mean)
+names(stepperdaymean) <- c("date","stepsmean")
+library(xtable)
 
+xt <- xtable(stepperdaymean)
+print(xt, type="html")
+```
 
-
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
+Here is the table of median values for each day
+```{r results='asis'}
+stepperdaymedian <- aggregate(activity[,"steps"] ~ activity[,"date"],
+                              activity,
+                              median)
+names(stepperdaymedian) <- c("date","stepsmedian")
+xt <- xtable(stepperdaymedian)
+print(xt, type="html")
+```
